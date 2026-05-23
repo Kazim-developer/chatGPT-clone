@@ -3,12 +3,23 @@ import { prisma } from "../db/prisma.js";
 
 const allChatsRouter = express.Router();
 
-allChatsRouter.get("/c", async (req, res) => {
-  const chats = await prisma.chat.findMany({
-    select: { name: true, id: true },
-  });
+allChatsRouter.get("/chats", async (req, res) => {
+  try {
+    const chats = await prisma.chat.findMany({
+      select: {
+        id: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
+    });
 
-  res.json({ chats });
+    return res.json({ chats });
+  } catch (error) {
+    console.error("Error fetching chats:", error);
+    return res.status(500).json({ message: "Failed to fetch chats" });
+  }
 });
 
 export default allChatsRouter;

@@ -21,3 +21,8 @@ body {
 button {
   @apply cursor-pointer active:scale-95;
 }
+
+input,
+select {
+  @apply border-1 p-2 border-gray-300 focus:border-black focus:outline-none rounded-lg;
+}

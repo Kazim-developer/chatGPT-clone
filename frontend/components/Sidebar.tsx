@@ -1,6 +1,6 @@
 "use client";
 
-import { searchChats } from "@/handlers/searchChats";
+import { getData } from "@/handlers/getData";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 export default function Sidebar() {
   const { data, isLoading } = useQuery({
     queryKey: ["all-chats"],
-    queryFn: searchChats,
+    queryFn: () => getData("chats"),
   });
 
   const router = useRouter();
@@ -28,7 +28,7 @@ export default function Sidebar() {
           Chat
         </button>
         <div>
-          <h1 className="text-gray-100 mb-2">Chats</h1>
+          <h1 className="text-gray-100 mb-2">Groups</h1>
           <hr className="text-gray-100 mb-5" />
           <div>
             {data.chats.map((chat: any, index: any) => {

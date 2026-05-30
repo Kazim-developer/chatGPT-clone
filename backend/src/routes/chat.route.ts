@@ -12,12 +12,17 @@ chatRouter.post("/chat/:chatId", async (req, res) => {
   const { chatId } = req.params;
   const { question } = req.body;
 
+  await prisma.message.create({
+    data: { role: "USER", content: question, chatId },
+  });
+
   const stream = await client.chat.completions.create({
     model: "gpt-4.1-mini",
     messages: [
       {
         role: "system",
-        content: "Answer only from the provided context.",
+        content:
+          "you are a programming teacher, give precis and short responses",
       },
       {
         role: "user",
@@ -27,7 +32,9 @@ chatRouter.post("/chat/:chatId", async (req, res) => {
     stream: true,
   });
 
-  res.setHeader("Content-Type", "text/plain");
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  res.setHeader("Transfer-Encoding", "chunked");
+  res.setHeader("Cache-Control", "no-cache");
 
   let fullResponse = "";
 
@@ -39,12 +46,8 @@ chatRouter.post("/chat/:chatId", async (req, res) => {
     }
   }
 
-  await prisma.conversation.create({
-    data: {
-      chatId,
-      query: question,
-      response: fullResponse,
-    },
+  await prisma.message.create({
+    data: { role: "ASSISTANT", content: fullResponse, chatId },
   });
 
   res.end();

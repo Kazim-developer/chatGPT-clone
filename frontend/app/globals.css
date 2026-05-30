@@ -19,7 +19,7 @@ body {
 }
 
 button {
-  @apply cursor-pointer active:scale-95;
+  @apply cursor-pointer;
 }
 
 input,

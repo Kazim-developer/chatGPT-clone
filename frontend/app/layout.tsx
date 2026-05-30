@@ -1,6 +1,7 @@
 import Sidebar from "@/components/Sidebar";
 import "./globals.css";
 import TanstackProviders from "@/components/TanstackProvider";
+import ReactToastifyProviders from "@/components/ReactToastifyProviders";
 
 export default function RootLayout({
   children,
@@ -11,10 +12,13 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <TanstackProviders>
-          <section className="flex gap-2">
-            <Sidebar />
-            {children}
-          </section>
+          <ReactToastifyProviders>
+            <section className="flex">
+              <Sidebar />
+
+              {children}
+            </section>
+          </ReactToastifyProviders>
         </TanstackProviders>
       </body>
     </html>

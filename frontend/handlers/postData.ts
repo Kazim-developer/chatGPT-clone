@@ -3,7 +3,6 @@ export async function postData(route: string, postedData: any) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(postedData),
-    credentials: "include",
   });
 
   const data = await res.json();

@@ -1,7 +1,7 @@
 "use client";
 
 import { postData } from "@/handlers/postData";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { hasErrors } from "@/util/hasErrors.util";
@@ -18,10 +18,13 @@ export default function HomePage() {
     chatGroup: "",
   });
 
-  const { mutate, data } = useMutation({
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
     mutationFn: () => postData("chat/create", newChatData),
     onSuccess: () => {
-      toast.success("account created successfully, redirecting ...");
+      setNewChatData({ chatName: "", chatGroup: "" });
+      queryClient.invalidateQueries({ queryKey: ["chat-groups"] });
     },
     onError: (error) => {
       if (hasErrors(error)) {
@@ -36,12 +39,12 @@ export default function HomePage() {
 
   return (
     <div className="h-screen w-full flex items-center justify-center">
-      <div className=" w-[50%] flex flex-col gap-5 border-1 border-gray-300 rounded-lg py-4">
+      <div className=" w-[50%] flex flex-col gap-5 bg-white rounded-lg py-4">
         <h1 className="text-2xl text-gray-800 text-center">Create new chat</h1>
         <CreateChatForm
           mutate={mutate}
-          newChatData={newChatData}
           setNewChatData={setNewChatData}
+          newChatData={newChatData}
         />
       </div>
     </div>

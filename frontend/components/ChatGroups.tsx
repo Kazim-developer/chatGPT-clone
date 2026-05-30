@@ -1,59 +1,85 @@
 "use client";
 
-import { NewChat } from "@/app/page";
+import Link from "next/link";
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getData } from "@/handlers/getData";
+import { usePathname } from "next/navigation";
+import clsx from "clsx";
 
-type ChatGroups = {
-  newChatData: NewChat;
-  setNewChatData: React.Dispatch<React.SetStateAction<NewChat>>;
-  setIsNewGroup: (value: boolean) => void;
-};
-
-export default function ChatGroups({
-  newChatData,
-  setNewChatData,
-  setIsNewGroup,
-}: ChatGroups) {
+export default function ChatGroups() {
   const { data, isLoading } = useQuery({
     queryKey: ["chat-groups"],
     queryFn: () => getData("chat-groups"),
   });
 
-  if (isLoading) {
-    return <h1>Loading ...</h1>;
+  const pathname = usePathname();
+
+  const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
+
+  function toggleItem(id: string) {
+    setOpenItems((s) => ({
+      ...s,
+      [id]: !s[id],
+    }));
   }
 
-  console.log(data);
+  if (!data || isLoading) {
+    return <h1>Loading...</h1>;
+  }
+
   return (
-    <select
-      defaultValue=""
-      onChange={(e) => {
-        const value = e.target.value;
+    <div className="flex flex-col gap-2">
+      {data.groups.map((group: any) => {
+        const isGroupActive = group.chat.some(
+          (chat: any) => pathname === `/chat/${chat.id}`,
+        );
 
-        if (value === "new-group") {
-          setIsNewGroup(true);
-        } else {
-          setIsNewGroup(false);
+        const isOpen = openItems[group.id] || isGroupActive;
 
-          setNewChatData((s) => ({
-            ...s,
-            chatGroup: value,
-          }));
-        }
-      }}
-    >
-      <option value="" disabled>
-        Select group
-      </option>
+        return (
+          <div key={group.id} className="rounded-xl overflow-hidden">
+            {/* Group Header */}
+            <button
+              onClick={() => toggleItem(group.id)}
+              className="w-full flex items-center gap-2"
+            >
+              <span className="font-medium text-gray-100">{group.name}</span>
+              <ChevronDown
+                size={18}
+                className={`transition-transform text-gray-100 duration-200 ${
+                  isOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
 
-      <option value="new-group">New Group</option>
-
-      {data.groups.map((group: any) => (
-        <option key={group.id} value={group.name}>
-          {group.name}
-        </option>
-      ))}
-    </select>
+            {/* Chats */}
+            {isOpen && (
+              <div className="flex flex-col px-2 pb-2">
+                {group.chat.length > 0 ? (
+                  group.chat.map((chat: any) => (
+                    <Link
+                      key={chat.id}
+                      href={`/chat/${chat.id}`}
+                      className={clsx(
+                        "my-2 py-2 pl-2 rounded-lg text-sm",
+                        pathname === `/chat/${chat.id}`
+                          ? "bg-white text-black"
+                          : "text-gray-100",
+                      )}
+                    >
+                      {chat.name}
+                    </Link>
+                  ))
+                ) : (
+                  <p className="px-3 py-2 text-sm text-gray-100">No chats</p>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
   );
 }

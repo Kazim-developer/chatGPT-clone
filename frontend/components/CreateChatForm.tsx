@@ -2,7 +2,7 @@
 
 import { NewChat } from "@/app/page";
 import { useState } from "react";
-import ChatGroups from "./ChatGroups";
+import ChatGroupSelection from "./ChatGroupSelection";
 
 type CreateChat = {
   mutate: () => void;
@@ -29,12 +29,13 @@ export default function CreateChatForm({
         type="text"
         placeholder="Enter new chat name"
         required
+        value={newChatData.chatName}
         onChange={(e) => {
           setNewChatData((s) => ({ ...s, chatName: e.target.value }));
         }}
       />
-      <ChatGroups
-        newChatData={newChatData}
+      <ChatGroupSelection
+        key={newChatData.chatName}
         setNewChatData={setNewChatData}
         setIsNewGroup={setIsNewGroup}
       />
@@ -43,6 +44,7 @@ export default function CreateChatForm({
           type="text"
           placeholder="Enter group name"
           required
+          value={newChatData.chatGroup}
           onChange={(e) =>
             setNewChatData((s) => ({ ...s, chatGroup: e.target.value }))
           }
